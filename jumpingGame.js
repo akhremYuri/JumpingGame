@@ -5,10 +5,13 @@ const cHeightOfCanvas = 150; //px
 if (!canvas.getContext) {
   alert("Your browser don't support the canvas element.");
 }
+
 const ctx = canvas.getContext("2d");
 
-const cZeroLevelOnY_axis = 88; //px
-function drawThePlayer(y = cZeroLevelOnY_axis) {
+const cLandLevelOnY = 88; //px
+const cJumpLevelOnY = 18; //px;
+
+function drawThePlayer(y = cLandLevelOnY) {
   ctx.beginPath();
   ctx.moveTo(60, y);
   ctx.arc(50, y, 10, 0, Math.PI * 2, true);
@@ -22,9 +25,49 @@ function drawThePlayer(y = cZeroLevelOnY_axis) {
   ctx.stroke();
 }
 
+function clearPlayerPartOfCanvas(y) {
+  const cWidthOfPlayer = 22;
+  const cHeightOfPlayer = 52;
+  const x0 = 39; //starting point of Player;
+  ctx.clearRect(x0, y - 11, cWidthOfPlayer, cHeightOfPlayer);
+}
+
+let jumpLevel = cLandLevelOnY;
+const cPlayerStep = 1;
+
+function movePlayer(step = 1) {
+  clearPlayerPartOfCanvas(jumpLevel);
+  jumpLevel += step;
+  drawThePlayer(jumpLevel);
+}
+
+function keyDownEvent(event) {
+  if (event.code == "Space") {
+    while (jumpLevel > cJumpLevelOnY) {
+      movePlayer(-cPlayerStep);
+    }
+  }
+}
+
+let keyDownTimerId;
+
+function keyUpEvent(event) {
+  if (event.code == "Space") {
+    keyDownTimerId = setTimeout(function down() {
+      movePlayer(cPlayerStep);
+      if (jumpLevel < cLandLevelOnY) {
+        keyDownTimerId = setTimeout(down, 10);
+      } else clearTimeout(keyDownTimerId);
+    }, 10);
+  }
+}
+
+document.addEventListener("keydown", keyDownEvent);
+document.addEventListener("keyup", keyUpEvent);
+
 const cRoadY = 140;
-const cBampY0 = 220; //px;
-let animateY = 0;
+const cTree0 = 220; //px;
+let animateX = 0;
 
 function drawRoad() {
   ctx.beginPath();
@@ -33,46 +76,65 @@ function drawRoad() {
   ctx.stroke();
 }
 
-function drawBamps(y0 = cBampY0) {
-  function drawBamp(x, y, radius = 10) {
+const cRadiusT = 15;
+
+function drawTrees(x0 = cTree0) {
+  function drawTree(x, y, radius = cRadiusT) {
     ctx.beginPath();
     ctx.moveTo(x, y); //220, 140
-    ctx.arc(x + radius, y, radius, Math.PI, 0);
+    ctx.lineTo(x, y - 30);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, y - 30, radius, (Math.PI / 180) * 135, (Math.PI / 180) * 45);
     ctx.fill();
   }
 
-  drawBamp(y0, cRoadY);
-  drawBamp(y0 + 200, cRoadY);
+  drawTree(x0, cRoadY);
+  drawTree(x0 + cRadiusT * 2, cRoadY);
+
+  drawTree(x0 + 200, cRoadY);
+}
+
+function clearTrees(x0 = cTree0) {
+  function clearTree(x, y, radius) {
+    ctx.clearRect(x - radius, y - 45, radius * 2, 30 + radius);
+  }
+
+  let y = cRoadY - 1;
+
+  clearTree(x0, y, cRadiusT);
+  clearTree(x0 + cRadiusT * 2, y, cRadiusT);
+
+  clearTree(x0 + 200, y, cRadiusT);
+}
+
+function animateTrees() {
+  // if (animateX < -200) animateX = 0;
+  clearTrees(animateX + cTree0);
+  animateX -= 30; // animateX--;
+  drawTrees(animateX + cTree0);
 }
 
 function draw() {
   drawRoad();
-
-  drawBamps();
-
+  drawTrees();
   drawThePlayer();
 }
 
 draw();
 
-// const cXPlayer = 70;
-
-function ClearPartOfCanvas(x = 0) {
-  ctx.clearRect(x, cRoadY - 15, cWidthOfCanvas, 14);
+function writeTextToCanvas(text) {
+  ctx.font = "48px serif";
+  ctx.fillText(text, 100, 50);
 }
+writeTextToCanvas("Game over.");
 
-function animateBamps() {
-  if (animateY < -200) animateY = 0;
-  ClearPartOfCanvas();
-  drawBamps(animateY + cBampY0);
-  // drawRoad();
-  animateY--;
-}
-
+//This functions is used in animation
 let timerId;
 
 function startInterval() {
-  timerId = setInterval(animateBamps, 10);
+  // timerId = setInterval(animateTrees, 10);
+  timerId = setTimeout(animateTrees, 1000);
 }
 
 function stopInterval() {
@@ -80,18 +142,9 @@ function stopInterval() {
   console.log("Interval stopped.");
 }
 
-function writeTextToCanvas(text) {
-  ctx.font = "48px serif";
-  ctx.fillText(text, 100, 50);
-}
-
-writeTextToCanvas("Game over, loser.");
-
-//This function is used in animation
 window.main = () => {
   window.requestAnimationFrame(main);
-  animateBamps();
-  console.log(`animateY: ${animateY}`);
+  animateTrees();
+  console.log(`animateX: ${animateX}`);
 };
-
 // main();
