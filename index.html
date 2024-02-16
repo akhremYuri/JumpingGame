@@ -4,15 +4,31 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simple Jumping Game</title>
+    <title>Jumping Game</title>
     <link rel="stylesheet" href="./jumpingGame.css" />
   </head>
   <body>
     <header id="header">
-      <h1>MAIN Assignment II (Create a Simple Jumping Game):</h1>
+      <h1>Simple Jumping Game.</h1>
+      <button
+        id="StopBtn"
+        onclick="stopInterval()"
+        style="width: 150px; height: 50px"
+      >
+        Stop
+      </button>
+      <button
+        id="StopBtn"
+        onclick="startInterval()"
+        style="width: 150px; height: 50px"
+      >
+        Start
+      </button>
     </header>
     <main>
-      <canvas id="canvas" width="1280" height="720"></canvas>
+      <canvas id="gameCanvas" width="600" height="150"
+        >Canvas of simple jumping game</canvas
+      >
     </main>
     <footer id="footer">&copy;2024</footer>
     <script src="./jumpingGame.js"></script>
