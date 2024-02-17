@@ -35,3 +35,10 @@ main {
   border: 10px solid greenyellow;
   /* background-color: azure; */
 }
+
+.speedGameProp {
+  max-width: 300px;
+  width: 100%;
+  margin: 5px auto;
+  text-align: left;
+}

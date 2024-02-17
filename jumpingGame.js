@@ -1,3 +1,4 @@
+"use strict";
 const canvas = document.getElementById("gameCanvas");
 const cWidthOfCanvas = 600; //px
 const cHeightOfCanvas = 150; //px
@@ -34,6 +35,7 @@ function clearPlayerPartOfCanvas(y) {
 
 let jumpLevel = cLandLevelOnY;
 const cPlayerStep = 1;
+let gameStopped = true;
 
 function movePlayer(step = 1) {
   clearPlayerPartOfCanvas(jumpLevel);
@@ -41,24 +43,48 @@ function movePlayer(step = 1) {
   drawThePlayer(jumpLevel);
 }
 
-function keyDownEvent(event) {
-  if (event.code == "Space") {
-    while (jumpLevel > cJumpLevelOnY) {
-      movePlayer(-cPlayerStep);
-    }
+function testMovePlayerUp() {
+  while (jumpLevel > cJumpLevelOnY) {
+    movePlayer(-cPlayerStep);
   }
 }
 
-let keyDownTimerId;
+function keyDownEvent(event) {
+  if (event.code == "Space") {
+    if (gameStopped) {
+      runGame();
+    } else {
+      if (jumpLevel > cJumpLevelOnY) {
+        movePlayer(-cPlayerStep);
+      }
+    }
+  } else if (event.code == "Enter" && gameStopped) {
+    startGame();
+  } else if (event.code == "Escape" && !gameStopped) {
+    gamePause();
+  }
+  console.log(event.code);
+  console.log(`keyDown event (gameStopped = ${gameStopped})`);
+}
+
+let keyUpTimerId;
+const speedOfGame = 10; //getSpeedOfTheGame()
+
+function movePlayerDown() {
+  movePlayer(cPlayerStep);
+  console.log("movePlayer Down");
+  if (jumpLevel < cLandLevelOnY) {
+    keyUpTimerId = setTimeout(movePlayerDown, speedOfGame);
+  } else {
+    console.log("movePlayerDown: clearTimeout");
+    clearTimeout(keyUpTimerId);
+  }
+}
 
 function keyUpEvent(event) {
   if (event.code == "Space") {
-    keyDownTimerId = setTimeout(function down() {
-      movePlayer(cPlayerStep);
-      if (jumpLevel < cLandLevelOnY) {
-        keyDownTimerId = setTimeout(down, 10);
-      } else clearTimeout(keyDownTimerId);
-    }, 10);
+    keyUpTimerId = setTimeout(movePlayerDown, speedOfGame);
+    console.log("keyUp event");
   }
 }
 
@@ -66,8 +92,7 @@ document.addEventListener("keydown", keyDownEvent);
 document.addEventListener("keyup", keyUpEvent);
 
 const cRoadY = 140;
-const cTree0 = 220; //px;
-let animateX = 0;
+let animateX = cWidthOfCanvas;
 
 function drawRoad() {
   ctx.beginPath();
@@ -78,7 +103,7 @@ function drawRoad() {
 
 const cRadiusT = 15;
 
-function drawTrees(x0 = cTree0) {
+function drawTrees(x0) {
   function drawTree(x, y, radius = cRadiusT) {
     ctx.beginPath();
     ctx.moveTo(x, y); //220, 140
@@ -95,7 +120,7 @@ function drawTrees(x0 = cTree0) {
   drawTree(x0 + 200, cRoadY);
 }
 
-function clearTrees(x0 = cTree0) {
+function clearTrees(x0) {
   function clearTree(x, y, radius) {
     ctx.clearRect(x - radius, y - 45, radius * 2, 30 + radius);
   }
@@ -106,35 +131,38 @@ function clearTrees(x0 = cTree0) {
   clearTree(x0 + cRadiusT * 2, y, cRadiusT);
 
   clearTree(x0 + 200, y, cRadiusT);
+
+  clearTree(x0 + 400, y, cRadiusT);
+  clearTree(x0 + 400 + cRadiusT * 2, y, cRadiusT);
 }
 
 function animateTrees() {
-  // if (animateX < -200) animateX = 0;
-  clearTrees(animateX + cTree0);
-  animateX -= 30; // animateX--;
-  drawTrees(animateX + cTree0);
+  clearTrees(animateX);
+  animateX--;
+  drawTrees(animateX);
+  if (animateX < 0) animateX = cWidthOfCanvas;
+  console.log(animateX);
 }
 
 function draw() {
   drawRoad();
-  drawTrees();
   drawThePlayer();
 }
 
-draw();
-
-function writeTextToCanvas(text) {
-  ctx.font = "48px serif";
-  ctx.fillText(text, 100, 50);
+function writeTextToCanvas(text, x = 100, y = 30) {
+  ctx.font = "28px serif";
+  ctx.fillText(text, x, y);
 }
-writeTextToCanvas("Game over.");
+
+function getSpeedOfTheGame() {
+  return +document.querySelector('input[name="speedLevel"]:checked').value;
+}
 
 //This functions is used in animation
 let timerId;
 
 function startInterval() {
-  // timerId = setInterval(animateTrees, 10);
-  timerId = setTimeout(animateTrees, 1000);
+  timerId = setInterval(animateTrees, speedOfGame);
 }
 
 function stopInterval() {
@@ -142,9 +170,51 @@ function stopInterval() {
   console.log("Interval stopped.");
 }
 
-window.main = () => {
-  window.requestAnimationFrame(main);
-  animateTrees();
-  console.log(`animateX: ${animateX}`);
-};
+function clearAllCanvas() {
+  ctx.clearRect(0, 0, cWidthOfCanvas, cHeightOfCanvas);
+}
+
+function startGame() {
+  animateX = cWidthOfCanvas;
+  clearAllCanvas();
+  draw();
+  testMovePlayerUp(); //Delete this instruction!!!
+  runGame();
+  console.log("startGame");
+}
+
+function clearTextInfoOnCanvas() {
+  ctx.clearRect(100, 0, 400, 100);
+}
+
+function runGame() {
+  startInterval();
+  gameStopped = false;
+  clearTextInfoOnCanvas();
+}
+
+function gamePause() {
+  stopInterval();
+  gameStopped = true;
+  writeTextToCanvas("Game on pause.");
+  writeTextToCanvas("Press space key to continue.", 100, 70);
+  console.log("gamePause");
+}
+
+function gameOver() {
+  stopInterval();
+  gameStopped = true;
+  writeTextToCanvas("Game over.");
+  writeTextToCanvas("Press any key to start again.", 100, 70);
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+// window.main = () => {
+//   window.requestAnimationFrame(main);
+//   animateTrees();
+//   console.log(`animateX: ${animateX}`);
+// };
 // main();

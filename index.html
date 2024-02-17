@@ -10,20 +10,39 @@
   <body>
     <header id="header">
       <h1>Simple Jumping Game.</h1>
-      <button
+      <!-- <button
         id="StopBtn"
-        onclick="stopInterval()"
+        onclick="gameOver()"
         style="width: 150px; height: 50px"
       >
         Stop
       </button>
-      <button
-        id="StopBtn"
-        onclick="startInterval()"
-        style="width: 150px; height: 50px"
-      >
+      <button id="StartBtn" onclick="startGame()" style="width: 150px; height: 50px">
         Start
-      </button>
+      </button> -->
+      <div class="speedGameProp">
+        <input type="radio" id="junior" name="speedLevel" value="1000" />
+        <label for="junior">Junior</label>
+      </div>
+      <div class="speedGameProp">
+        <input type="radio" id="middle" name="speedLevel" value="1000" />
+        <label for="middle">Middle</label>
+      </div>
+      <div class="speedGameProp">
+        <input
+          type="radio"
+          id="senior"
+          name="speedLevel"
+          value="1000"
+          checked
+        />
+        <label for="senior">Senior</label>
+      </div>
+      <ol>
+        <li>To start game press "Enter" key</li>
+        <li>To make a pause press "Escape" key</li>
+        <li>To make a jump press "Space" key</li>
+      </ol>
     </header>
     <main>
       <canvas id="gameCanvas" width="600" height="150"
