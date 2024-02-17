@@ -34,7 +34,7 @@ function clearPlayerPartOfCanvas(y) {
 }
 
 let jumpLevel = cLandLevelOnY;
-const cPlayerStep = 1;
+const cPlayerStep = 5;
 let gameStopped = true;
 
 function movePlayer(step = 1) {
