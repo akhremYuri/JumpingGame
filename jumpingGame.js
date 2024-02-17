@@ -102,6 +102,12 @@ function drawRoad() {
 }
 
 const cRadiusT = 15;
+let treesArr = [0, 200, 400, 600];
+let treesType = treesArr.map((x) => getRandomInt(2));
+
+function isInCanvasArea(x) {
+  return x < -(cRadiusT * 2) || x > cWidthOfCanvas + cRadiusT * 2;
+}
 
 function drawTrees(x0) {
   function drawTree(x, y, radius = cRadiusT) {
@@ -114,10 +120,13 @@ function drawTrees(x0) {
     ctx.fill();
   }
 
-  drawTree(x0, cRoadY);
-  drawTree(x0 + cRadiusT * 2, cRoadY);
-
-  drawTree(x0 + 200, cRoadY);
+  for (let i = 0; i < treesArr.length; i++) {
+    let addTree = treesType[i];
+    drawTree(x0 + treesArr[i], cRoadY);
+    if (addTree) {
+      drawTree(x0 + treesArr[i] + cRadiusT * 2, cRoadY);
+    }
+  }
 }
 
 function clearTrees(x0) {
@@ -127,20 +136,20 @@ function clearTrees(x0) {
 
   let y = cRoadY - 1;
 
-  clearTree(x0, y, cRadiusT);
-  clearTree(x0 + cRadiusT * 2, y, cRadiusT);
-
-  clearTree(x0 + 200, y, cRadiusT);
-
-  clearTree(x0 + 400, y, cRadiusT);
-  clearTree(x0 + 400 + cRadiusT * 2, y, cRadiusT);
+  for (let i = 0; i < treesArr.length; i++) {
+    let addTree = treesType[i];
+    clearTree(x0 + treesArr[i], y, cRadiusT);
+    if (addTree) {
+      clearTree(x0 + treesArr[i] + cRadiusT * 2, y, cRadiusT);
+    }
+  }
 }
 
 function animateTrees() {
   clearTrees(animateX);
   animateX--;
   drawTrees(animateX);
-  if (animateX < 0) animateX = cWidthOfCanvas;
+  if (animateX < -(cWidthOfCanvas + cRadiusT * 2)) animateX = cWidthOfCanvas;
   console.log(animateX);
 }
 
@@ -178,7 +187,7 @@ function startGame() {
   animateX = cWidthOfCanvas;
   clearAllCanvas();
   draw();
-  testMovePlayerUp(); //Delete this instruction!!!
+  // testMovePlayerUp(); //Delete this instruction!!!
   runGame();
   console.log("startGame");
 }
