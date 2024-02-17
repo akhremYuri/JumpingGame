@@ -43,12 +43,6 @@ function movePlayer(step = 1) {
   drawThePlayer(jumpLevel);
 }
 
-function testMovePlayerUp() {
-  while (jumpLevel > cJumpLevelOnY) {
-    movePlayer(-cPlayerStep);
-  }
-}
-
 function keyDownEvent(event) {
   if (event.code == "Space") {
     if (gameStopped) {
@@ -68,13 +62,13 @@ function keyDownEvent(event) {
 }
 
 let keyUpTimerId;
-const speedOfGame = 10; //getSpeedOfTheGame()
+const speedOfGame = 15;
 
 function movePlayerDown() {
   movePlayer(cPlayerStep);
   console.log("movePlayer Down");
   if (jumpLevel < cLandLevelOnY) {
-    keyUpTimerId = setTimeout(movePlayerDown, speedOfGame);
+    keyUpTimerId = setTimeout(movePlayerDown, 1);
   } else {
     console.log("movePlayerDown: clearTimeout");
     clearTimeout(keyUpTimerId);
@@ -83,7 +77,7 @@ function movePlayerDown() {
 
 function keyUpEvent(event) {
   if (event.code == "Space") {
-    keyUpTimerId = setTimeout(movePlayerDown, speedOfGame);
+    keyUpTimerId = setTimeout(movePlayerDown, 1);
     console.log("keyUp event");
   }
 }
@@ -103,7 +97,7 @@ function drawRoad() {
 
 const cRadiusT = 15;
 let treesArr = [0, 200, 400, 600];
-let treesType = treesArr.map((x) => getRandomInt(2));
+let treesType = treesArr.map(() => getRandomInt(2));
 
 function isInCanvasArea(x) {
   return x < -(cRadiusT * 2) || x > cWidthOfCanvas + cRadiusT * 2;
@@ -112,7 +106,7 @@ function isInCanvasArea(x) {
 function drawTrees(x0) {
   function drawTree(x, y, radius = cRadiusT) {
     ctx.beginPath();
-    ctx.moveTo(x, y); //220, 140
+    ctx.moveTo(x, y);
     ctx.lineTo(x, y - 30);
     ctx.stroke();
     ctx.beginPath();
@@ -149,7 +143,8 @@ function animateTrees() {
   clearTrees(animateX);
   animateX--;
   drawTrees(animateX);
-  if (animateX < -(cWidthOfCanvas + cRadiusT * 2)) animateX = cWidthOfCanvas;
+  if (animateX < -(cWidthOfCanvas + cRadiusT * 2 + 30))
+    animateX = cWidthOfCanvas;
   console.log(animateX);
 }
 
@@ -187,7 +182,6 @@ function startGame() {
   animateX = cWidthOfCanvas;
   clearAllCanvas();
   draw();
-  // testMovePlayerUp(); //Delete this instruction!!!
   runGame();
   console.log("startGame");
 }
