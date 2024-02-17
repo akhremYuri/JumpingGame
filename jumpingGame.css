@@ -1,4 +1,44 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: inherit;
+}
+
+html, body {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.5rem;
+}
+
+h1 {
+  margin: 20px;
+}
+
+#header, #footer {
+  text-align: center;
+  padding: 20px;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+}
+
+#gameCanvas {
+  border: 10px solid greenyellow;
+  /* background-color: azure; */
+}
+
+.speedGameProp {
+  max-width: 300px;
+  width: 100%;
+  margin: 5px auto;
+  text-align: left;
 }
